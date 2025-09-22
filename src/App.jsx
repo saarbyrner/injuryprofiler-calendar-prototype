@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import LayoutWithMainNav from './components/LayoutWithMainNav'
 import SimplePage from './pages/SimplePage'
 import Athletes from './pages/Athletes'
+import CalendarPage from './pages/Calendar'
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
         <Route path="/athlete" element={<Athletes />} />
         <Route path="/workloads" element={<SimplePage pageName="Workload" />} />
         <Route path="/questionnaires" element={<SimplePage pageName="Forms" />} />
-        <Route path="/planning" element={<SimplePage pageName="Calendar" />} />
+        <Route path="/planning" element={<CalendarPage />} />
         <Route path="/activity" element={<SimplePage pageName="Activity log" />} />
         <Route path="/settings" element={<SimplePage pageName="Admin" />} />
         <Route path="/help" element={<SimplePage pageName="Help" />} />

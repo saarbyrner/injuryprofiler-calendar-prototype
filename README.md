@@ -1,95 +1,201 @@
-# Design Prototype Template
+# InjuryProfiler Calendar Prototype
 
-Clean, reusable prototype template with design system enforcement and sports team assets.
+A pixel-perfect replica of the injuryprofiler.com/calendar interface built with React and FullCalendar, using mock data from the Design Prototyping Kit.
 
-## 🚀 Quick Start
+## Overview
 
-```bash
-npm install    # Install dependencies
-npm run dev    # Start development server
-```
-**Open browser:** http://localhost:5173
+This project recreates the exact look, feel, and functionality of the original injuryprofiler.com calendar interface. It includes:
 
-## 📁 What You Get
+- **Pixel-perfect UI matching** the original design system
+- **FullCalendar integration** with custom styling
+- **Mock data integration** from training sessions and games
+- **Event categorization** (Training Sessions, Games, Meetings, etc.)
+- **Multiple view modes** (Month, Week, Day, List)
+- **Interactive event handling** with click events
 
-- **Design System**: Pre-built components with automatic brand compliance
-- **Sports Assets**: Premier League and NBA team logos included
-- **Mock Data**: Realistic sports management data (athletes, teams, matches)
-- **Auto-Validation**: Pre-commit hooks prevent design violations
+## Features
 
-## 🎯 Core Components
+### Calendar Views
+- **Month View**: Grid layout showing all events for the month
+- **Week View**: Detailed weekly schedule with time slots
+- **Day View**: Single day detailed view
+- **List View**: Chronological list of events
 
-```jsx
-import { Button, Icon, Card, PlayerAvatar, LogoImage } from './components'
+### Event Types
+- **Training Sessions**: Strength training, cardio, technical skills, recovery sessions
+- **Games/Matches**: League games, cup matches, friendly matches
+- **Meetings**: Team meetings, coaching sessions
+- **Custom Events**: Any other scheduled activities
 
-<Button variant="contained" size="small">Add athlete</Button>
-<PlayerAvatar playerId="123" playerName="John Smith" />
-<LogoImage type="team" logoId="arsenal" league="premier-league" height={40} />
-```
+### Event Details
+Each event includes:
+- **Time and duration**
+- **Location and venue**
+- **Coach/Staff information**
+- **Squad/Team details**
+- **Attendance tracking**
+- **Session notes and objectives**
+- **Weather and surface conditions**
 
-**Design Rules (Auto-Enforced):**
-- Colors: Use `var(--color-primary)` instead of `#3B4960`
-- Buttons: Only `variant="contained"` allowed
-- Icons: Material Icons Outlined only
-- Text: Sentence case ("Add athlete" not "Add Athlete")
+## Technical Stack
 
-## 📂 Key Files
+- **React 18** - Frontend framework
+- **FullCalendar 6** - Calendar component library
+- **Vite** - Build tool and dev server
+- **CSS3** - Custom styling for pixel-perfect match
+- **JSON** - Mock data from Design Prototyping Kit
+
+## Project Structure
 
 ```
 src/
-├── components/           # Pre-built components (Button, Card, etc.)
-├── styles/design-tokens.css  # Colors: --color-primary, --color-secondary
-├── data/                 # Mock JSON data (athletes, teams, matches)
-│   ├── athletes.json
-│   ├── teams.json
-│   └── squads_teams.json
-└── utils/assetManager.js # Team logo handling
-
-public/assets/logos/teams/
-├── premier-league/       # Arsenal, Chelsea, Liverpool, etc.
-└── nba/                  # Lakers, Warriors, Bulls, etc.
+├── components/
+│   └── Calendar/
+│       ├── constants.js          # Calendar constants and enums
+│       ├── styles.js            # Styling configuration
+│       ├── helpers.js           # Event rendering helpers
+│       ├── FullCalendarComponent.jsx  # Main calendar component
+│       └── index.jsx            # Calendar wrapper component
+├── pages/
+│   └── Calendar/
+│       └── index.jsx            # Calendar page component
+├── utils/
+│   └── calendarDataTransform.js # Data transformation utilities
+├── data/                        # Mock data files
+│   ├── training_sessions.json
+│   ├── games_matches.json
+│   └── ...
+└── styles/
+    └── calendar.css            # Custom calendar styling
 ```
 
-## 🛠️ Commands
+## Getting Started
 
-```bash
-npm run dev                    # Start development
-npm run validate-design-system # Check compliance
-npm run lint                   # Fix code style
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd injuryprofiler-calendar-prototype
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in browser**
+   Navigate to `http://localhost:5173/planning` to view the calendar
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint errors
+- `npm run lint:css` - Run Stylelint
+- `npm run lint:css:fix` - Fix Stylelint errors
+
+## Usage
+
+### Navigation
+- Use the navigation buttons (Previous/Next) to change months
+- Click "Today" to return to current date
+- Switch between views using the view buttons (Month/Week/Day/List)
+
+### Events
+- **Click events** to view details in browser console
+- **Training sessions** appear in blue
+- **Games/Matches** appear in red
+- **Other events** use color-coded system
+
+### Data
+The calendar uses mock data from:
+- `src/data/training_sessions.json` - Training session data
+- `src/data/games_matches.json` - Game and match data
+
+## Customization
+
+### Adding New Event Types
+1. Update `CALENDAR_EVENT_TYPES` in `src/components/Calendar/constants.js`
+2. Add color scheme in `src/utils/calendarDataTransform.js`
+3. Create transformation function for new event type
+
+### Styling
+- Main styles: `src/styles/calendar.css`
+- Component styles: `src/components/Calendar/styles.js`
+- Colors: `src/components/Calendar/constants.js`
+
+### Data Format
+Events follow FullCalendar format with extended properties:
+```javascript
+{
+  id: "unique-id",
+  title: "Event Title",
+  start: "2024-01-15T10:00:00Z",
+  end: "2024-01-15T11:30:00Z",
+  backgroundColor: "#3a8dee",
+  borderColor: "#0e478a",
+  textColor: "#ffffff",
+  extendedProps: {
+    type: "TRAINING_SESSION",
+    squad: { id: 1, name: "First Team" },
+    location: "Training Field 1",
+    coach: "John Smith",
+    // ... other properties
+  }
+}
 ```
 
-## 📊 Mock Data
+## Design System
 
-**Available datasets** (all in `src/data/`):
-- `athletes.json` - Player profiles and stats
-- `teams.json` - Premier League and NBA teams
-- `squads_teams.json` - Squad rosters and formations
-- `games_matches.json` - Match results and fixtures
-- `injuries_medical.json` - Medical data
+The calendar uses the exact color palette and styling from the original Kitman design system:
 
-## 🏆 Team Logos
+### Colors
+- **Primary Blue**: #3a8dee
+- **Primary Dark Blue**: #0e478a
+- **Accent Blue**: #082e5a
+- **Text Dark**: #3f4448
+- **Background**: #ffffff
+- **Border**: #e8eaed
 
-**Premier League:** Arsenal, Chelsea, Liverpool, Manchester United, Manchester City, Tottenham, Everton, Leeds United
+### Typography
+- **Headers**: 500 weight, #3f4448 color
+- **Event Text**: 600 weight, white color
+- **Time Text**: 400 weight, 11px size
 
-**NBA:** Lakers, Warriors, Bulls, Celtics
+## Browser Support
 
-```jsx
-<LogoImage type="team" logoId="arsenal" league="premier-league" />
-<LogoImage type="team" logoId="lakers" league="nba" />
-```
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-## 📋 Design Rules (Auto-Enforced)
+## Contributing
 
-**Pre-commit hooks prevent:**
-- ❌ Hardcoded colors (`#3B4960` → use `var(--color-primary)`)
-- ❌ Wrong button variants (`outlined` → use `contained`)
-- ❌ Non-outlined icons (`Dashboard` → use `DashboardOutlined`)
-- ❌ Title Case text (`Add Athlete` → use `Add athlete`)
+1. Fork the repository
+2. Create a feature branch
+3. Make changes maintaining pixel-perfect accuracy
+4. Test across different browsers
+5. Submit a pull request
 
-## 🎯 Quick Tips
+## License
 
-- **Colors:** Edit `src/styles/design-tokens.css`
-- **Navigation:** Add pages in `src/App.jsx`
-- **Data:** Use JSON files in `src/data/`
-- **Assets:** Team logos auto-load from `public/assets/`
-- **Validation:** Run `npm run validate-design-system`
+This project is for prototyping purposes and maintains the same licensing as the original Design Prototyping Kit.
+
+## Notes
+
+- This is a prototype using mock data
+- No backend integration is included
+- Event clicks log to console for demonstration
+- All styling matches the original injuryprofiler.com calendar exactly

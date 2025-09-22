@@ -204,7 +204,7 @@ function MedinahLayoutWithMainNav({ children }) {
           sx={{ 
             flex: 1, 
             overflow: 'auto',
-            p: 3,
+            p: 0,
             bgcolor: 'var(--color-background-secondary)'
           }}
         >
