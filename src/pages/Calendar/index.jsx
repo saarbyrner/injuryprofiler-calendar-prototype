@@ -98,6 +98,61 @@ const CalendarPage = () => {
     setEvents(filtered);
   }, [allEvents, filters]);
 
+  // Helper function to calculate optimal tooltip position
+  const calculateTooltipPosition = (eventRect, containerRect, tooltipWidth = 400, tooltipHeight = 200) => {
+    const padding = 10;
+    
+    // Calculate position relative to the calendar container
+    const eventLeft = eventRect.left - containerRect.left;
+    const eventTop = eventRect.top - containerRect.top;
+    const eventRight = eventLeft + eventRect.width;
+    const eventBottom = eventTop + eventRect.height;
+    const eventCenterX = eventLeft + (eventRect.width / 2);
+    const eventCenterY = eventTop + (eventRect.height / 2);
+    
+    // Calculate available space in each direction
+    const spaceRight = containerRect.width - eventRight - padding;
+    const spaceLeft = eventLeft - padding;
+    const spaceBelow = containerRect.height - eventBottom - padding;
+    const spaceAbove = eventTop - padding;
+    
+    let x, y, positionType = '';
+    
+    // Determine best position based on available space
+    if (spaceRight >= tooltipWidth) {
+      // Position to the right (preferred)
+      x = eventRight;
+      y = eventCenterY - (tooltipHeight / 2);
+      positionType = 'right';
+    } else if (spaceLeft >= tooltipWidth) {
+      // Position to the left
+      x = eventLeft - tooltipWidth;
+      y = eventCenterY - (tooltipHeight / 2);
+      positionType = 'left';
+    } else if (spaceBelow >= tooltipHeight) {
+      // Position below
+      x = eventCenterX - (tooltipWidth / 2);
+      y = eventBottom;
+      positionType = 'below';
+    } else if (spaceAbove >= tooltipHeight) {
+      // Position above
+      x = eventCenterX - (tooltipWidth / 2);
+      y = eventTop - tooltipHeight;
+      positionType = 'above';
+    } else {
+      // Fallback: position to the right and adjust if needed
+      x = eventRight;
+      y = eventCenterY - (tooltipHeight / 2);
+      positionType = 'right (fallback)';
+    }
+    
+    // Ensure tooltip stays within container bounds
+    x = Math.max(padding, Math.min(x, containerRect.width - tooltipWidth - padding));
+    y = Math.max(padding, Math.min(y, containerRect.height - tooltipHeight - padding));
+    
+    return { x, y, positionType };
+  };
+
   const handleEventClick = (eventObj) => {
     console.log('Event clicked:', eventObj);
     
@@ -111,28 +166,40 @@ const CalendarPage = () => {
     console.log('Event data:', event);
     console.log('Event URL:', event.url);
     
-    // Get click position for tooltip placement
-    const rect = jsEvent.target.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const tooltipWidth = 300; // Approximate tooltip width
+    // Close any existing tooltip first
+    setTooltip({ show: false, event: null, position: { x: 0, y: 0 } });
     
-    // Calculate position with viewport bounds checking
-    let x = rect.left + rect.width / 2 - tooltipWidth / 2;
-    let y = rect.bottom + 10;
-    
-    // Adjust if tooltip would go off screen
-    if (x < 10) x = 10;
-    if (x + tooltipWidth > viewportWidth - 10) x = viewportWidth - tooltipWidth - 10;
-    
-    const position = { x, y };
-    
-    console.log('Setting tooltip with position:', position);
-    
-    setTooltip({
-      show: true,
-      event: event,
-      position: position
-    });
+    // Use setTimeout to ensure DOM is updated and we get accurate positioning
+    setTimeout(() => {
+      // Get click position for tooltip placement
+      const eventRect = jsEvent.target.getBoundingClientRect();
+      
+      // Get the calendar container's position to calculate relative positioning
+      const calendarContainer = document.querySelector('.calendar');
+      if (!calendarContainer) {
+        console.error('Calendar container not found');
+        return;
+      }
+      
+      const containerRect = calendarContainer.getBoundingClientRect();
+      
+      // Calculate optimal tooltip position
+      const { x, y, positionType } = calculateTooltipPosition(eventRect, containerRect);
+      const position = { x, y };
+      
+      console.log('Setting tooltip with position:', position);
+      console.log('Position type:', positionType);
+      console.log('Container rect:', containerRect);
+      console.log('Event rect:', eventRect);
+      console.log('Event ID:', event.id);
+      console.log('Event title:', event.title);
+      
+      setTooltip({
+        show: true,
+        event: event,
+        position: position
+      });
+    }, 0);
     
     // Return false to prevent default behavior
     return false;
@@ -326,6 +393,7 @@ const CalendarPage = () => {
       {/* Event Tooltip */}
       {tooltip.show && (
         <EventTooltip
+          key={tooltip.event?.id || 'tooltip'}
           event={tooltip.event}
           position={tooltip.position}
           onClose={handleCloseTooltip}

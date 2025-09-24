@@ -3,7 +3,7 @@ import { Box, Typography, IconButton, Badge, Popover } from '@mui/material';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { Add, ArrowDropDown, ChevronLeft, ChevronRight, FilterList } from '@mui/icons-material';
+import { ArrowDropDown, ChevronLeft, ChevronRight, FilterList } from '@mui/icons-material';
 import Button from './Button';
 
 const CalendarHeader = ({ 
@@ -169,9 +169,7 @@ const CalendarHeader = ({
           variant="primary"
           onClick={onAddEvent}
         >
-          <Add sx={{ fontSize: '16px', marginRight: '8px' }} />
           Add
-          <ArrowDropDown sx={{ fontSize: '16px', marginLeft: '8px' }} />
         </Button>
       </Box>
 

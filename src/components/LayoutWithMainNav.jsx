@@ -100,22 +100,31 @@ function MedinahLayoutWithMainNav({ children }) {
         {/* Top App Bar */}
         <AppBar 
           position="sticky" 
-          elevation={1}
+          elevation={0}
           sx={{ 
             bgcolor: '#ffffff',
             color: '#333333',
             borderBottom: '1px solid #e0e0e0',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            height: '50px'
           }}
         >
-          <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Toolbar sx={{ 
+            display: 'flex',
+            justifyContent: 'space-between', 
+            minHeight: '50px !important', 
+            height: '50px !important',
+            alignItems: 'center',
+            padding: '0 16px !important',
+            boxSizing: 'border-box'
+          }}>
             {/* Page Title */}
             <Typography 
               variant="h6" 
               component="h1"
               sx={{ 
-                fontWeight: 600,
-                color: 'var(--color-text-primary)',
+                fontWeight: 400,
+                color: '#666666',
+                fontSize: '16px',
                 textTransform: 'none'
               }}
             >

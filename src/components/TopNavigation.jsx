@@ -12,7 +12,7 @@ const TopNavigation = () => {
         padding: '16px 24px',
         backgroundColor: '#ffffff',
         borderBottom: '1px solid #e0e0e0',
-        minHeight: '64px',
+        height: '50px',
       }}
     >
       {/* Left Section - Logo and Breadcrumbs */}
@@ -39,8 +39,8 @@ const TopNavigation = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography
             sx={{
-              color: '#0F28FF',
-              fontWeight: 600,
+              color: '#666666',
+              fontWeight: 400,
               fontSize: '16px',
             }}
           >

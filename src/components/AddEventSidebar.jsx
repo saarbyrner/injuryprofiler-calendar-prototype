@@ -32,6 +32,9 @@ import {
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AthleteSelectorDropdown } from './AthleteSelector';
+import { transformAthleteData } from '../utils/athleteDataTransform';
+import { mockAthletes } from '../data/mockAthletes';
 
 const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) => {
   const [formData, setFormData] = useState({
@@ -50,6 +53,13 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
   });
 
   const [errors, setErrors] = useState({});
+  
+  // Athlete selector dropdown state
+  const [athleteSelectorOpen, setAthleteSelectorOpen] = useState(false);
+  const [athleteSelectorAnchor, setAthleteSelectorAnchor] = useState(null);
+  
+  // Use rich mock data for the athlete selector
+  const transformedAthletes = mockAthletes;
 
   // Design system compliant form field styles - following FiltersSidebar pattern
   const formFieldStyles = {
@@ -178,6 +188,29 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
         [field]: '',
       }));
     }
+  };
+
+  // Athlete selector handlers
+  const handleAthleteSelectorOpen = (event) => {
+    setAthleteSelectorAnchor(event.currentTarget);
+    setAthleteSelectorOpen(true);
+  };
+
+  const handleAthleteSelectorClose = () => {
+    setAthleteSelectorOpen(false);
+    setAthleteSelectorAnchor(null);
+  };
+
+  const handleAthleteSelectionChange = (selectedAthleteIds) => {
+    // Convert selected athlete IDs to mock athlete objects for display
+    const selectedAthletes = selectedAthleteIds.map(id => 
+      mockAthletes.find(athlete => athlete.id === id)
+    ).filter(Boolean);
+    
+    setFormData(prev => ({
+      ...prev,
+      selectedAthletes,
+    }));
   };
 
   const handleFileUpload = (event) => {
@@ -466,19 +499,43 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
 
               {/* Athletes */}
               <Grid item xs={12}>
-                <Autocomplete
-                  multiple
-                  options={athletes}
-                  getOptionLabel={(option) => `${option.firstname} ${option.lastname}`}
-                  value={formData.selectedAthletes}
-                  onChange={(event, newValue) => handleInputChange('selectedAthletes', newValue)}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Athletes"
+                  value={formData.selectedAthletes.length > 0 ? `${formData.selectedAthletes.length} athlete${formData.selectedAthletes.length !== 1 ? 's' : ''} selected` : ''}
+                  placeholder="Select athletes..."
+                  onClick={handleAthleteSelectorOpen}
+                  InputProps={{
+                    readOnly: true,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Person fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    ...formFieldStyles,
+                    cursor: 'pointer',
+                    '& .MuiInputBase-input': {
+                      cursor: 'pointer',
+                    },
+                  }}
+                />
+                
+                {/* Selected athletes chips */}
+                {formData.selectedAthletes.length > 0 && (
+                  <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {formData.selectedAthletes.map((athlete) => (
                       <Chip
-                        key={option.id}
-                        label={`${option.firstname} ${option.lastname}`}
-                        {...getTagProps({ index })}
+                        key={athlete.id}
+                        label={athlete.name}
+                        onDelete={() => {
+                          const updatedAthletes = formData.selectedAthletes.filter(a => a.id !== athlete.id);
+                          handleInputChange('selectedAthletes', updatedAthletes);
+                        }}
                         icon={<Person />}
+                        size="small"
                         sx={{
                           backgroundColor: 'var(--color-background-selected)',
                           color: 'var(--color-text-primary)',
@@ -487,18 +544,9 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
                           },
                         }}
                       />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="filled"
-                      label="Athletes"
-                      placeholder="Select athletes..."
-                      sx={formFieldStyles}
-                    />
-                  )}
-                />
+                    ))}
+                  </Box>
+                )}
               </Grid>
 
               {/* Staff */}
@@ -668,6 +716,18 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
           </Box>
         </Box>
       </Drawer>
+
+      {/* Athlete Selector Dropdown */}
+      <AthleteSelectorDropdown
+        open={athleteSelectorOpen}
+        onClose={handleAthleteSelectorClose}
+        anchorEl={athleteSelectorAnchor}
+        athletes={transformedAthletes}
+        selectedAthletes={formData.selectedAthletes.map(athlete => athlete.id)}
+        onSelectionChange={handleAthleteSelectionChange}
+        title="Select Athletes"
+        maxHeight={500}
+      />
     </LocalizationProvider>
   );
 };

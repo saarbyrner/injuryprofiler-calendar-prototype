@@ -71,8 +71,8 @@ const EventTooltip = ({
       className="event-tooltip"
       sx={{
         position: 'absolute',
-        left: position.x,
-        top: position.y,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
         zIndex: 1000,
         backgroundColor: '#ffffff',
         border: '1px solid #e0e0e0',
@@ -82,6 +82,7 @@ const EventTooltip = ({
         maxWidth: '400px',
         padding: '16px',
         fontFamily: 'Arial, sans-serif',
+        pointerEvents: 'auto', // Ensure tooltip can receive clicks
       }}
     >
       {/* Header with icon, title and duplicate button */}
