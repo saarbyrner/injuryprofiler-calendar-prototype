@@ -27,6 +27,8 @@
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.3",
     "@mui/x-data-grid-premium": "^6.20.5",
+    "@mui/x-date-pickers": "^8.11.3",
+    "date-fns": "^4.1.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "prop-types": "^15.8.1",

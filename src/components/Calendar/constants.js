@@ -31,6 +31,8 @@ export const EVENT_TIME_FORMAT = {
 export const CALENDAR_VIEWS = {
   dayGridMonth: {
     dayMaxEvents: 3,
+    fixedWeekCount: true,
+    showNonCurrentDates: false,
   },
   timeGrid: {
     eventMinHeight: 15,

@@ -35,7 +35,7 @@ export const getEventContent = (
     case CALENDAR_VIEW_OPTIONS.listWeek: {
       return (
         <div style={eventTextStyles[CALENDAR_VIEW_OPTIONS.listWeek]}>
-          <a href={url}>{eventRenderText}</a>
+          {eventRenderText}
         </div>
       );
     }

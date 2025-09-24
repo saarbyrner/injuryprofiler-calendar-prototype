@@ -199,3 +199,44 @@ This project is for prototyping purposes and maintains the same licensing as the
 - No backend integration is included
 - Event clicks log to console for demonstration
 - All styling matches the original injuryprofiler.com calendar exactly
+
+## Filtros del Calendario (Nuevo)
+
+Se ha implementado un sidebar de filtros funcional que permite filtrar los eventos mostrados en el calendario por:
+
+- Squads (equipos / grupos)
+- Types (tipo de evento: TRAINING_SESSION, TEST_SESSION, etc.)
+- Locations (ubicación del evento)
+
+El sistema deriva automáticamente las opciones disponibles a partir de los eventos cargados (`calendar_events.json`). Todas las opciones empiezan seleccionadas para no ocultar información de inicio.
+
+### Arquitectura de Filtrado
+
+1. El estado fuente de la verdad de eventos está en `CalendarPage` (`allEvents`).
+2. El estado de filtros seleccionados también vive en `CalendarPage` (`filters`).
+3. `FiltersSidebar` recibe:
+   - `availableOptions`: opciones derivadas (memo) de todos los eventos.
+   - `selectedFilters`: el estado actual.
+   - `onFiltersChange`: callback que actualiza el estado en el contenedor.
+4. Cada cambio recalcula la lista filtrada (`events`) que se pasa al componente `Calendar`.
+
+### Extender Filtros
+
+Para añadir un nuevo filtro (por ejemplo, coach):
+
+1. Derivar opciones en el memo `availableOptions` (añadir `coaches: new Set()` y poblarlo).
+2. Incluir `coaches: []` en el estado `filters` inicial y en la inicialización.
+3. Añadir lógica de inicialización en el `useEffect` que copia todas las opciones al cargar.
+4. Extender el `useEffect` de filtrado para aplicar la nueva condición.
+5. Añadir una nueva `FilterSection` en `FiltersSidebar` siguiendo el patrón de Squads / Types.
+
+### Próximas Mejoras Sugeridas
+
+- Persistir selección de filtros en `localStorage` o query params.
+- Añadir contador global por categoría directo en el header (ya soportado con lengths).
+- Filtro de rango de fechas independiente (pre-filtrando eventos antes de pasar a FullCalendar).
+- Búsqueda global de eventos (por título / coach / ubicación).
+- Soporte para multi-select de atletas y staff cuando se disponga de datos reales.
+- Accesibilidad: mejorar navegación por teclado y roles ARIA en el sidebar.
+
+---

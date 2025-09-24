@@ -84,6 +84,9 @@ const FullCalendarComponent = ({
         height="auto"
         selectable={false}
         droppable={false}
+        moreLinkClick="popover"
+        fixedWeekCount={true}
+        showNonCurrentDates={false}
         select={(selectionInfo) =>
           handleEventSelect && handleEventSelect(selectionInfo, orgTimeZone)
         }
@@ -112,14 +115,14 @@ const FullCalendarComponent = ({
         }
         eventDidMount={onEventDidMount}
         datesSet={onDatesRender}
-            dayMaxEventRows={3}
-            eventMinHeight={20}
+        eventMinHeight={20}
         viewDidMount={onViewDidMount}
         slotDuration="00:30:00"
         defaultTimedEventDuration="00:01"
         slotLabelFormat={EVENT_TIME_FORMAT}
         snapDuration="00:15:00"
         views={CALENDAR_VIEWS}
+        dayMaxEventRows={3}
         nowIndicator
         navLinks
       />

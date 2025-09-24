@@ -1,511 +1,291 @@
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  TextField, 
-  FormControlLabel, 
-  Checkbox, 
-  Collapse,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Chip
-} from '@mui/material';
-import { ExpandMore, ExpandLess, Search, Close } from '@mui/icons-material';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ExpandMoreOutlined, ExpandLessOutlined, SearchOutlined, CloseOutlined } from '@mui/icons-material';
+import MedinahButton from './Button';
+import '../styles/design-tokens.css';
 
-const FiltersSidebar = ({ onClose }) => {
+// Utilidad para filtrar por búsqueda simple (case-insensitive)
+const matchSearch = (label, term) => label.toLowerCase().includes(term.toLowerCase());
+
+/**
+ * Sidebar de Filtros
+ * Props:
+ *  - onClose: cerrar sidebar
+ *  - selectedFilters: { squads:[], types:[], locations:[] }
+ *  - availableOptions: { squads:[], types:[], locations:[] }
+ *  - onFiltersChange: (filtrosActualizados) => void
+ */
+const FiltersSidebar = ({ onClose, selectedFilters, availableOptions, onFiltersChange }) => {
   // Accordion states
   const [squadsExpanded, setSquadsExpanded] = useState(true);
   const [typesExpanded, setTypesExpanded] = useState(true);
   const [attendeesExpanded, setAttendeesExpanded] = useState(true);
   const [locationExpanded, setLocationExpanded] = useState(true);
   const [gamesExpanded, setGamesExpanded] = useState(true);
-
-  // Filter states
-  const [squadFilters, setSquadFilters] = useState({
-    '1st team': true,
-    'Academy Squad': true,
-    'Academy team': true,
-    'International Squad': false,
-    'team_1': false,
-    'team_2': false,
-    'Test': false,
-  });
-
-  const [typeFilters, setTypeFilters] = useState({
-    'Squad Sessions': true,
-    'Games': true,
-    'Individual Sessions': false,
-    'Events': false,
-  });
-
-  const [locationFilters, setLocationFilters] = useState({
-    'Home': false,
-    'Away': false,
-    'Neutral': false,
-  });
-
-  const [selectedAthletes, setSelectedAthletes] = useState([]);
-  const [selectedStaff, setSelectedStaff] = useState([]);
-  const [selectedCompetition, setSelectedCompetition] = useState('');
-  const [selectedOpposition, setSelectedOpposition] = useState('');
-  const [locationSearch, setLocationSearch] = useState('');
-
-  // Search states
+  // Estado local de búsqueda
   const [squadSearch, setSquadSearch] = useState('');
   const [typeSearch, setTypeSearch] = useState('');
+  const [locationSearch, setLocationSearch] = useState('');
 
-  // Helper functions
-  const getActiveFilterCount = (filters) => {
-    return Object.values(filters).filter(Boolean).length;
-  };
+  // Derivar listas filtradas por búsqueda
+  const filteredSquads = useMemo(() => availableOptions.squads.filter(s => matchSearch(s, squadSearch)), [availableOptions.squads, squadSearch]);
+  const filteredTypes = useMemo(() => availableOptions.types.filter(t => matchSearch(t, typeSearch)), [availableOptions.types, typeSearch]);
+  const filteredLocations = useMemo(() => availableOptions.locations.filter(l => matchSearch(l, locationSearch)), [availableOptions.locations, locationSearch]);
 
-  const handleSquadChange = (squad) => {
-    setSquadFilters(prev => ({
-      ...prev,
-      [squad]: !prev[squad]
-    }));
-  };
-
-  const handleTypeChange = (type) => {
-    setTypeFilters(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
-  };
-
-  const handleLocationChange = (location) => {
-    setLocationFilters(prev => ({
-      ...prev,
-      [location]: !prev[location]
-    }));
-  };
-
-  const selectAll = (setter, keys) => {
-    setter(prev => {
-      const newFilters = {};
-      keys.forEach(key => {
-        newFilters[key] = true;
-      });
-      return newFilters;
-    });
-  };
-
-  const clearAll = (setter, keys) => {
-    setter(prev => {
-      const newFilters = {};
-      keys.forEach(key => {
-        newFilters[key] = false;
-      });
-      return newFilters;
-    });
-  };
+  // Helpers de modificación
+  const toggleInArray = (arr, value) => arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value];
+  const setAll = (key, values) => onFiltersChange({ ...selectedFilters, [key]: values.slice() });
+  const clearAll = (key) => onFiltersChange({ ...selectedFilters, [key]: [] });
+  const handleToggle = (key, value) => onFiltersChange({ ...selectedFilters, [key]: toggleInArray(selectedFilters[key], value) });
 
   const FilterSection = ({ 
     title, 
-    count, 
+    count,
     expanded, 
     onToggle, 
     children, 
-    onSelectAll, 
+    onSelectAll,
     onClearAll,
     showSearch = true,
     searchValue = '',
     onSearchChange = () => {}
   }) => (
-    <Box sx={{ mb: 1 }}>
-      <Box
-        sx={{
+  <div className="form-section" style={{ margin: 0, boxShadow: 'none', borderRadius: 0, border: 'none' }}>
+      <div
+        className="form-section-header"
+        onClick={onToggle}
+        style={{
+          background: '#fff',
+          cursor: 'pointer',
+          padding: 'var(--spacing-md) var(--spacing-lg)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '12px 16px',
-          backgroundColor: '#f8f9fa',
-          cursor: 'pointer',
-          borderBottom: '1px solid #e5e5e5',
-          '&:hover': {
-            backgroundColor: '#f0f0f0',
-          },
+          border: 'none',
+          boxShadow: 'none',
         }}
-        onClick={onToggle}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography
-            sx={{
-              color: '#333333',
-              fontWeight: 500,
-              fontSize: '14px',
-            }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span className="sidebar-title" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-semibold)' }}>
             {title}
-          </Typography>
+          </span>
           {count > 0 && (
-            <Box
-              sx={{
-                backgroundColor: '#0F28FF',
-                color: 'white',
-                fontSize: '11px',
-                fontWeight: 500,
-                height: '18px',
-                minWidth: '18px',
-                borderRadius: '9px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 6px',
-              }}
-            >
+            <div className="filter-badge">
               {count}
-            </Box>
+            </div>
           )}
-        </Box>
-        {expanded ? <ExpandLess sx={{ color: '#666666' }} /> : <ExpandMore sx={{ color: '#666666' }} />}
-      </Box>
+        </div>
+        {expanded ? <ExpandLessOutlined className="sidebar-close" /> : <ExpandMoreOutlined className="sidebar-close" />}
+      </div>
       
-      <Collapse in={expanded}>
-        <Box sx={{ padding: '16px', backgroundColor: '#ffffff', borderBottom: '1px solid #e5e5e5' }}>
-          {showSearch && (
-            <TextField
-              size="small"
-              placeholder="Search"
-              value={searchValue}
-              onChange={(e) => onSearchChange(e.target.value)}
-              InputProps={{
-                startAdornment: <Search sx={{ color: '#666666', mr: 1, fontSize: '16px' }} />,
-              }}
-              sx={{
-                width: '100%',
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ffffff',
-                  '& fieldset': {
-                    borderColor: '#d0d0d0',
-                    borderRadius: '4px',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#0F28FF',
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#0F28FF',
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  color: '#333333',
-                  fontSize: '14px',
-                  padding: '8px 12px',
-                  '&::placeholder': {
-                    color: '#999999',
-                    opacity: 1,
-                  },
-                },
-              }}
-            />
-          )}
+      {expanded && (
+        <div>
+          <div className="form-section-content" style={{ padding: 'var(--spacing-md) var(--spacing-lg)', margin: 0 }}>
+            {showSearch && (
+            <div style={{ position: 'relative', marginBottom: 'var(--spacing-md)' }}>
+              <SearchOutlined 
+                style={{ 
+                  position: 'absolute', 
+                  left: 'var(--spacing-sm)', 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: 'var(--icon-size-medium)'
+                }} 
+              />
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Search"
+                value={searchValue}
+                onChange={(e) => onSearchChange(e.target.value)}
+                style={{ paddingLeft: 'calc(var(--spacing-sm) + var(--icon-size-medium) + var(--spacing-sm))' }}
+              />
+            </div>
+            )}
 
-          {onSelectAll && onClearAll && (
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-              <Typography
-                sx={{
-                  color: '#0F28FF',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                  '&:hover': { textDecoration: 'underline' },
-                }}
+            {onSelectAll && onClearAll && (
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-md)' }}>
+              <button
+                type="button"
                 onClick={onSelectAll}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-primary)',
+                  fontSize: 'var(--font-size-xs)',
+                  cursor: 'pointer',
+                  fontWeight: 'var(--font-weight-medium)',
+                  textDecoration: 'underline'
+                }}
               >
                 Select all
-              </Typography>
-              <Typography sx={{ color: '#cccccc', fontSize: '12px' }}>|</Typography>
-              <Typography
-                sx={{
-                  color: '#0F28FF',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                  '&:hover': { textDecoration: 'underline' },
-                }}
+              </button>
+              <span style={{ color: 'var(--color-text-disabled)', fontSize: 'var(--font-size-xs)' }}>|</span>
+              <button
+                type="button"
                 onClick={onClearAll}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-primary)',
+                  fontSize: 'var(--font-size-xs)',
+                  cursor: 'pointer',
+                  fontWeight: 'var(--font-weight-medium)',
+                  textDecoration: 'underline'
+                }}
               >
                 Clear
-              </Typography>
-            </Box>
-          )}
+              </button>
+            </div>
+            )}
 
-          {children}
-        </Box>
-      </Collapse>
-    </Box>
+            {children}
+          </div>
+          {/* Divider only at the bottom of each expanded accordion */}
+          <div style={{ borderBottom: '1px solid var(--color-border-primary)', height: 0 }} />
+        </div>
+      )}
+    </div>
   );
 
-  const CheckboxList = ({ items, checkedItems, onChange, disabledItems = [] }) => (
-    <Box component="ul" sx={{ listStyle: 'none', padding: 0, margin: 0 }}>
-      {Object.entries(items).map(([key, value]) => (
-        <Box component="li" key={key} sx={{ mb: 1 }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checkedItems[key] || false}
-                onChange={() => onChange(key)}
-                disabled={disabledItems.includes(key)}
-                sx={{
-                  color: '#0F28FF',
-                  padding: '4px',
-                  '&.Mui-checked': {
-                    color: '#0F28FF',
-                  },
-                  '&.Mui-disabled': {
-                    color: '#cccccc',
-                  },
-                }}
-              />
-            }
-            label={
-              <Typography
-                sx={{
-                  color: checkedItems[key] ? '#333333' : '#666666',
-                  fontSize: '14px',
-                  fontWeight: checkedItems[key] ? 500 : 400,
-                }}
-              >
-                {value}
-              </Typography>
-            }
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              width: '100%',
-              margin: 0,
-              padding: '4px 0',
-            }}
+  const CheckboxList = ({ items, selected, onChange }) => (
+    <div>
+      {items.map(item => (
+        <div key={item} className="form-checkbox">
+          <input
+            type="checkbox"
+            id={`checkbox-${item}`}
+            checked={selected.includes(item)}
+            onChange={() => onChange(item)}
           />
-        </Box>
+          <label htmlFor={`checkbox-${item}`}>{item}</label>
+        </div>
       ))}
-    </Box>
+      {!items.length && (
+        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>No results</div>
+      )}
+    </div>
   );
 
   const SelectField = ({ label, value, onChange, placeholder, options = [] }) => (
-    <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-      <InputLabel sx={{ fontSize: '14px', color: '#666666' }}>{label}</InputLabel>
-      <Select
+    <div style={{ marginBottom: 'var(--spacing-md)' }}>
+      <label className="form-label">{label}</label>
+      <select
+        className="form-input"
         value={value}
         onChange={onChange}
-        label={label}
-        displayEmpty
-        sx={{
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#d0d0d0',
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#0F28FF',
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#0F28FF',
-          },
-          '& .MuiSelect-select': {
-            color: '#333333',
-            fontSize: '14px',
-          },
-        }}
+        style={{ width: '100%' }}
       >
-        <MenuItem value="" sx={{ fontSize: '14px', color: '#999999' }}>
-          {placeholder}
-        </MenuItem>
+        <option value="">{placeholder}</option>
         {options.map((option) => (
-          <MenuItem key={option.value} value={option.value} sx={{ fontSize: '14px' }}>
+          <option key={option.value} value={option.value}>
             {option.label}
-          </MenuItem>
+          </option>
         ))}
-      </Select>
-    </FormControl>
+      </select>
+    </div>
   );
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         width: '340px',
-        backgroundColor: '#ffffff',
-        borderRight: '1px solid #e0e0e0',
+        backgroundColor: 'var(--color-background-primary)',
+        borderRight: '1px solid var(--color-border-primary)',
         height: '100%',
         overflowY: 'auto',
         position: 'relative',
       }}
     >
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '16px 20px',
-          borderBottom: '1px solid #e5e5e5',
-          backgroundColor: '#ffffff',
-        }}
-      >
-        <Typography
-          sx={{
-            color: '#333333',
-            fontWeight: 600,
-            fontSize: '16px',
-          }}
-        >
-          Filters
-        </Typography>
-        <Close sx={{ color: '#666666', cursor: 'pointer', fontSize: '20px' }} onClick={onClose} />
-      </Box>
+      <div className="sidebar-header">
+        <h2 className="sidebar-title">Filters</h2>
+        <CloseOutlined className="sidebar-close" onClick={onClose} />
+      </div>
 
-      <Box sx={{ padding: 0 }}>
+      <div style={{ padding: 0 }}>
         {/* Squads Section */}
         <FilterSection
           title="Squads"
-          count={getActiveFilterCount(squadFilters)}
+          count={selectedFilters.squads.length}
           expanded={squadsExpanded}
           onToggle={() => setSquadsExpanded(!squadsExpanded)}
-          onSelectAll={() => selectAll(setSquadFilters, Object.keys(squadFilters))}
-          onClearAll={() => clearAll(setSquadFilters, Object.keys(squadFilters))}
+          onSelectAll={() => setAll('squads', availableOptions.squads)}
+          onClearAll={() => clearAll('squads')}
           searchValue={squadSearch}
           onSearchChange={setSquadSearch}
         >
           <CheckboxList
-            items={squadFilters}
-            checkedItems={squadFilters}
-            onChange={handleSquadChange}
-            disabledItems={['International Squad']}
+            items={filteredSquads}
+            selected={selectedFilters.squads}
+            onChange={(value) => handleToggle('squads', value)}
           />
         </FilterSection>
 
         {/* Types Section */}
         <FilterSection
           title="Types"
-          count={getActiveFilterCount(typeFilters)}
+          count={selectedFilters.types.length}
           expanded={typesExpanded}
           onToggle={() => setTypesExpanded(!typesExpanded)}
-          onSelectAll={() => selectAll(setTypeFilters, Object.keys(typeFilters))}
-          onClearAll={() => clearAll(setTypeFilters, Object.keys(typeFilters))}
+          onSelectAll={() => setAll('types', availableOptions.types)}
+          onClearAll={() => clearAll('types')}
           searchValue={typeSearch}
           onSearchChange={setTypeSearch}
         >
           <CheckboxList
-            items={typeFilters}
-            checkedItems={typeFilters}
-            onChange={handleTypeChange}
+            items={filteredTypes}
+            selected={selectedFilters.types}
+            onChange={(value) => handleToggle('types', value)}
           />
         </FilterSection>
 
         {/* Attendees Section */}
+        {/* Placeholder de Attendees (sin implementación de datos reales aún) */}
         <FilterSection
           title="Attendees"
-          count={selectedAthletes.length + selectedStaff.length}
+          count={0}
           expanded={attendeesExpanded}
           onToggle={() => setAttendeesExpanded(!attendeesExpanded)}
           showSearch={false}
         >
-          <SelectField
-            label="Athletes"
-            value={selectedAthletes}
-            onChange={(e) => setSelectedAthletes(e.target.value)}
-            placeholder="Search for athletes"
-            options={[
-              { value: 'athlete1', label: 'John Doe' },
-              { value: 'athlete2', label: 'Jane Smith' },
-              { value: 'athlete3', label: 'Mike Johnson' },
-            ]}
-          />
-          <SelectField
-            label="Staff"
-            value={selectedStaff}
-            onChange={(e) => setSelectedStaff(e.target.value)}
-            placeholder="Search for staff"
-            options={[
-              { value: 'staff1', label: 'Coach Wilson' },
-              { value: 'staff2', label: 'Dr. Brown' },
-              { value: 'staff3', label: 'Trainer Davis' },
-            ]}
-          />
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+            (Próximamente)
+          </div>
         </FilterSection>
 
         {/* Location Section */}
         <FilterSection
           title="Location"
-          count={getActiveFilterCount(locationFilters)}
+          count={selectedFilters.locations.length}
           expanded={locationExpanded}
           onToggle={() => setLocationExpanded(!locationExpanded)}
-          showSearch={false}
+          onSelectAll={() => setAll('locations', availableOptions.locations)}
+          onClearAll={() => clearAll('locations')}
+          searchValue={locationSearch}
+          onSearchChange={setLocationSearch}
         >
           <CheckboxList
-            items={locationFilters}
-            checkedItems={locationFilters}
-            onChange={handleLocationChange}
-          />
-          <TextField
-            size="small"
-            placeholder="Search locations"
-            value={locationSearch}
-            onChange={(e) => setLocationSearch(e.target.value)}
-            InputProps={{
-              endAdornment: <Search sx={{ color: '#666666', fontSize: '16px' }} />,
-            }}
-            sx={{
-              width: '100%',
-              mt: 2,
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: '#ffffff',
-                '& fieldset': {
-                  borderColor: '#d0d0d0',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#0F28FF',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#0F28FF',
-                },
-              },
-              '& .MuiInputBase-input': {
-                color: '#333333',
-                fontSize: '14px',
-                '&::placeholder': {
-                  color: '#999999',
-                  opacity: 1,
-                },
-              },
-            }}
+            items={filteredLocations}
+            selected={selectedFilters.locations}
+            onChange={(value) => handleToggle('locations', value)}
           />
         </FilterSection>
 
         {/* Games Section */}
         <FilterSection
           title="Games"
-          count={selectedCompetition ? 1 : 0}
+          count={0}
           expanded={gamesExpanded}
           onToggle={() => setGamesExpanded(!gamesExpanded)}
           showSearch={false}
         >
-          <SelectField
-            label=""
-            value={selectedCompetition}
-            onChange={(e) => setSelectedCompetition(e.target.value)}
-            placeholder="Competition"
-            options={[
-              { value: 'premier-league', label: 'Premier League' },
-              { value: 'champions-league', label: 'Champions League' },
-              { value: 'fa-cup', label: 'FA Cup' },
-            ]}
-          />
-          <SelectField
-            label=""
-            value={selectedOpposition}
-            onChange={(e) => setSelectedOpposition(e.target.value)}
-            placeholder="Opposition"
-            options={[
-              { value: 'arsenal', label: 'Arsenal' },
-              { value: 'chelsea', label: 'Chelsea' },
-              { value: 'liverpool', label: 'Liverpool' },
-            ]}
-          />
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+            (Pendiente de definición de modelo de datos de competiciones)
+          </div>
         </FilterSection>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 
