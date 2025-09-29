@@ -301,6 +301,47 @@ built = ensureSquadSize(built, 'U25', 8, 300);
 built = ensureSquadSize(built, 'U27', 6, 400);
 built = ensureSquadSize(built, 'U30', 4, 500);
 
+// ---------------------------------------------------------------------------
+// Demo Club Mapping
+// We assign each athlete a club if not already provided using a deterministic
+// round-robin across a fixed pool. This allows the Clubs view to filter and
+// add/remove athletes realistically. If an athlete already had an explicit
+// club (manually set above), it is preserved.
+// ---------------------------------------------------------------------------
+// NOTE: Previously only a subset (10) of clubs was used for assignment which meant
+// selecting clubs outside that subset (e.g. Bournemouth, Brentford, etc.) added zero athletes.
+// This appeared to users as if selection "stopped working" after 2–3 clubs (~18 athletes total),
+// because additional chosen clubs contributed no new players. We now align the assignment pool
+// with the full exported `clubs` list below so every club in the UI has athletes.
+const CLUB_POOL = [
+  'Arsenal',
+  'Aston Villa',
+  'Bournemouth',
+  'Brentford',
+  'Brighton & Hove Albion',
+  'Chelsea',
+  'Crystal Palace',
+  'Everton',
+  'Fulham',
+  'Ipswich Town',
+  'Leicester City',
+  'Liverpool',
+  'Manchester City',
+  'Manchester United',
+  'Newcastle United',
+  'Nottingham Forest',
+  'Southampton',
+  'Tottenham Hotspur',
+  'West Ham United',
+  'Wolverhampton Wanderers',
+];
+
+built.forEach((athlete, idx) => {
+  if (!athlete.club) {
+    athlete.club = CLUB_POOL[idx % CLUB_POOL.length];
+  }
+});
+
 export const mockAthletes = built;
 
 // Premier League clubs (example data for Clubs view)

@@ -239,7 +239,7 @@ export const AthleteSelectorTreeContent: React.FC<AthleteSelectorContentProps> =
         </Box>
           <Box>
             <Chip
-              label={`Selected (${selectedAthletes.length})`}
+              label={`Athletes selected (${selectedAthletes.length})`}
               color={selectedAthletes.length > 0 ? 'primary' : 'default'}
               size="small"
               clickable={selectedAthletes.length > 0}
@@ -305,7 +305,12 @@ export const AthleteSelectorTreeContent: React.FC<AthleteSelectorContentProps> =
             showOnlySelected={false}
           />
         ) : menuSelection === 'clubs' ? (
-          <ClubsList clubs={clubs} />
+          <ClubsList
+            clubs={clubs}
+            athletes={athletes}
+            selectedAthletes={selectedAthletes}
+            onAthleteSelectionsChange={onSelectionChange}
+          />
         ) : menuSelection === 'free-agents' ? (
           filters.searchTerm.trim() === '' ? (
             <Box sx={{ p: 3, textAlign: 'center' }}>

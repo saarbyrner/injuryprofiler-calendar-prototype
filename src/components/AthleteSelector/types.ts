@@ -11,6 +11,8 @@ export interface Athlete {
   leagueId?: string;
   labels?: string[];
   isSelected?: boolean;
+  /** Optional associated club (for clubs x squads selection) */
+  club?: string;
 }
 
 export interface AgeGroup {

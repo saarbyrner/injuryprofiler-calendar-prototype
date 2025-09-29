@@ -517,36 +517,14 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
                   sx={{
                     ...formFieldStyles,
                     cursor: 'pointer',
+                    mb: 0, // prevent reserved space under field now that chips removed
                     '& .MuiInputBase-input': {
                       cursor: 'pointer',
                     },
                   }}
                 />
                 
-                {/* Selected athletes chips */}
-                {formData.selectedAthletes.length > 0 && (
-                  <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {formData.selectedAthletes.map((athlete) => (
-                      <Chip
-                        key={athlete.id}
-                        label={athlete.name}
-                        onDelete={() => {
-                          const updatedAthletes = formData.selectedAthletes.filter(a => a.id !== athlete.id);
-                          handleInputChange('selectedAthletes', updatedAthletes);
-                        }}
-                        icon={<Person />}
-                        size="small"
-                        sx={{
-                          backgroundColor: 'var(--color-background-selected)',
-                          color: 'var(--color-text-primary)',
-                          '& .MuiChip-deleteIcon': {
-                            color: 'var(--color-text-secondary)',
-                          },
-                        }}
-                      />
-                    ))}
-                  </Box>
-                )}
+                {/* Removed per requirement: external selected athletes chip list */}
               </Grid>
 
               {/* Staff */}
