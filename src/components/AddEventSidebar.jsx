@@ -542,7 +542,7 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
                     }
                     label={
                       <Typography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
-                        Select this option to create an event per squad that you select in this dropdown.
+                        Show events only on this calendar
                       </Typography>
                     }
                     sx={{ m: 0 }}
