@@ -53,6 +53,13 @@ export interface AthleteSelectorProps {
   variant?: 'drawer' | 'dropdown';
   loading?: boolean;
   error?: string;
+  /**
+   * When enabled, the consumer should create one event per selected squad.
+   * This component only exposes the toggle; consuming parent handles behavior.
+   */
+  perSquadEvent?: boolean;
+  /** Callback when the per-squad event checkbox changes */
+  onPerSquadEventChange?: (enabled: boolean) => void;
 }
 
 export interface AthleteSelectorContentProps extends Omit<AthleteSelectorProps, 'variant'> {

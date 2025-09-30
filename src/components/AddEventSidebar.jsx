@@ -15,6 +15,7 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
+  Checkbox,
   Divider,
   Paper,
   Grid,
@@ -57,6 +58,8 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
   // Athlete selector dropdown state
   const [athleteSelectorOpen, setAthleteSelectorOpen] = useState(false);
   const [athleteSelectorAnchor, setAthleteSelectorAnchor] = useState(null);
+  // Control whether to create one event per selected squad
+  const [perSquadEvent, setPerSquadEvent] = useState(false);
   
   // Use rich mock data for the athlete selector
   const transformedAthletes = mockAthletes;
@@ -523,8 +526,28 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
                     },
                   }}
                 />
-                
-                {/* Removed per requirement: external selected athletes chip list */}
+                {/* Per-squad toggle under Athlete selector field */}
+                <Box sx={{ mt: 1 }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={perSquadEvent}
+                        onChange={(e) => setPerSquadEvent(e.target.checked)}
+                        sx={{
+                          color: 'var(--color-text-secondary)',
+                          '&.Mui-checked': { color: 'var(--color-primary)' },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography variant="caption" sx={{ color: 'var(--color-text-secondary)' }}>
+                        Select this option to create an event per squad that you select in this dropdown.
+                      </Typography>
+                    }
+                    sx={{ m: 0 }}
+                  />
+                </Box>
               </Grid>
 
               {/* Staff */}
@@ -705,6 +728,8 @@ const AddEventSidebar = ({ open, onClose, onSave, athletes = [], staff = [] }) =
         onSelectionChange={handleAthleteSelectionChange}
         title="Select Athletes"
         maxHeight={500}
+        perSquadEvent={perSquadEvent}
+        onPerSquadEventChange={setPerSquadEvent}
       />
     </LocalizationProvider>
   );
