@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Typography, IconButton, Badge, Popover } from '@mui/material';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -19,6 +19,13 @@ const CalendarHeader = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState(currentDate || new Date('2025-09-01'));
   const [datePickerAnchor, setDatePickerAnchor] = useState(null);
+
+  // Sync selectedDate with currentDate prop when it changes
+  useEffect(() => {
+    if (currentDate) {
+      setSelectedDate(currentDate);
+    }
+  }, [currentDate]);
 
   const handleDateClick = (event) => {
     setDatePickerAnchor(event.currentTarget);
