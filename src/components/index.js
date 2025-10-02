@@ -13,6 +13,13 @@ export { default as MainNavigation } from './MainNavigation'
 export { default as AthleteDataGrid } from './AthleteDataGrid'
 export { default as EventTooltip } from './EventTooltip'
 export { default as AddEventSidebar } from './AddEventSidebar'
+export { default as AIDashboard } from './AIDashboard'
+export { default as AIInsightsPanel } from './AIInsightsPanel'
+export { default as DevelopmentMetrics } from './DevelopmentMetrics'
+export { default as PredictiveAnalytics } from './PredictiveAnalytics'
+export { default as AIDemo } from './AIDemo'
+export { default as SquadOverviewTable } from './SquadOverviewTable'
+export { default as SparklineChart } from './SparklineChart'
 
 // Usage Examples:
 // import { Button, Icon, Card, PlayerAvatar, LogoImage } from '../components'

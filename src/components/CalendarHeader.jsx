@@ -31,6 +31,12 @@ const CalendarHeader = ({
   const handleDateChange = (newDate) => {
     console.log('Date changed in CalendarHeader:', newDate);
     setSelectedDate(newDate);
+    // Don't close the popover here - let onAccept handle the closing
+  };
+
+  const handleDateAccept = (newDate) => {
+    console.log('Date accepted in CalendarHeader:', newDate);
+    setSelectedDate(newDate);
     if (onDateChange) {
       onDateChange(newDate);
     }
@@ -197,8 +203,9 @@ const CalendarHeader = ({
           <StaticDatePicker
             value={selectedDate}
             onChange={handleDateChange}
-            views={['year', 'month']}
-            openTo="month"
+            onAccept={handleDateAccept}
+            views={['year', 'month', 'day']}
+            openTo="day"
             displayStaticWrapperAs="desktop"
             slotProps={{
               actionBar: {
@@ -241,6 +248,25 @@ const CalendarHeader = ({
                 },
               },
               '& .MuiPickersMonth-monthButton': {
+                cursor: 'pointer',
+                color: '#333333',
+                fontFamily: 'Open Sans, sans-serif',
+                fontSize: '14px',
+                fontWeight: 400,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#f2f3f5',
+                  color: '#3B4960',
+                },
+                '&.Mui-selected': {
+                  backgroundColor: '#3B4960',
+                  color: '#ffffff',
+                  '&:hover': {
+                    backgroundColor: '#2f3a4d',
+                  },
+                },
+              },
+              '& .MuiPickersDay-dayButton': {
                 cursor: 'pointer',
                 color: '#333333',
                 fontFamily: 'Open Sans, sans-serif',
