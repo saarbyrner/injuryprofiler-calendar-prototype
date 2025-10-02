@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Typography, IconButton, Menu, MenuItem, Tooltip, Chip } from '@mui/material';
-// Handle MUI X License
-import { LicenseInfo } from '@mui/x-data-grid-premium';
+// Use free MUI X DataGrid instead of premium
 import { 
-  DataGridPremium, 
+  DataGrid, 
   GridToolbarColumnsButton, 
   GridToolbarFilterButton, 
   GridToolbarDensitySelector,
@@ -12,7 +11,7 @@ import {
   GridToolbarQuickFilter,
   GridPagination,
   gridClasses
-} from '@mui/x-data-grid-premium';
+} from '@mui/x-data-grid';
 import { 
   DeleteOutlined, 
   AssignmentOutlined,
@@ -305,7 +304,7 @@ const AthleteDataGrid = ({
 
   return (
     <Box sx={containerStyles}>
-      <DataGridPremium
+      <DataGrid
         rows={data}
         columns={columns}
         paginationModel={paginationModel}
