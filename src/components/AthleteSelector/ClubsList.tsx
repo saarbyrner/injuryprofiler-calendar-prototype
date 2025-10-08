@@ -9,8 +9,11 @@ import {
   Collapse,
   Divider,
   Tooltip,
+  Stack,
 } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon, ArrowBack as ArrowBackIcon, ChevronRightOutlined as ChevronRightOutlinedIcon } from '@mui/icons-material';
+import { GroupedAthleteList } from './GroupedAthleteList';
+import { GroupBy, SortOrder } from './types';
 
 interface ClubsListProps {
   /** Array of club names */
@@ -61,6 +64,8 @@ export const ClubsList: React.FC<ClubsListProps> = ({
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [internalSelectedClubs, setInternalSelectedClubs] = useState<Set<string>>(new Set());
   const [internalSelectedSquads, setInternalSelectedSquads] = useState<Record<string, Set<string>>>({});
+  // Drill-down navigation state: when set, show players for the chosen club+squad
+  const [drillDown, setDrillDown] = useState<{ club: string; squad: string } | null>(null);
 
   const selectedClubs = useMemo(() => new Set(valueClubs ?? Array.from(internalSelectedClubs)), [valueClubs, internalSelectedClubs]);
   const selectedSquads = useMemo(() => {
@@ -174,6 +179,25 @@ export const ClubsList: React.FC<ClubsListProps> = ({
     recomputeGlobalSelection(nextSelectedSquadsState);
   };
 
+  // Player-level selection handlers used in drill-down view
+  const handlePlayerToggle = useCallback((athleteId: string, selected: boolean) => {
+    if (!onAthleteSelectionsChange) return;
+    const current = new Set<string>(selectedAthletes);
+    if (selected) current.add(athleteId); else current.delete(athleteId);
+    onAthleteSelectionsChange(Array.from(current));
+  }, [onAthleteSelectionsChange, selectedAthletes]);
+
+  const handleBatchPlayersToggle = useCallback((athleteIds: string[], selected: boolean) => {
+    if (!onAthleteSelectionsChange) return;
+    const current = new Set<string>(selectedAthletes);
+    if (selected) {
+      athleteIds.forEach(id => current.add(id));
+    } else {
+      athleteIds.forEach(id => current.delete(id));
+    }
+    onAthleteSelectionsChange(Array.from(current));
+  }, [onAthleteSelectionsChange, selectedAthletes]);
+
   const isClubIndeterminate = (club: string) => {
     const squads = getSquads(club);
     const sel = selectedSquads[club];
@@ -226,6 +250,55 @@ export const ClubsList: React.FC<ClubsListProps> = ({
       recomputeGlobalSelection(nextSquads);
     }
   };
+
+  // If user drilled into a specific squad, render the players list with back header
+  if (drillDown) {
+    const { club, squad } = drillDown;
+    const ageGroup = squadToAgeGroup[squad];
+    const viewAthletes = (athletes ?? []).filter(a => (!a.club || a.club === club) && (!ageGroup || a.ageGroup === ageGroup));
+    return (
+      <Box>
+        <List disablePadding>
+          <ListItem
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              px: 2,
+              py: 1.25,
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              gap: 1,
+              fontFamily: 'var(--font-family-primary)',
+              backgroundColor: 'background.paper',
+            }}
+          >
+            <IconButton size="small" onClick={() => setDrillDown(null)} aria-label="Back to squads">
+              <ArrowBackIcon fontSize="small" />
+            </IconButton>
+            <Stack direction="column" sx={{ ml: 1 }}>
+              <Typography variant="body1" sx={{ fontFamily: 'var(--font-family-primary)', fontWeight: 600 }}>
+                {club}
+              </Typography>
+              <Typography variant="body2" sx={{ fontFamily: 'var(--font-family-primary)', color: 'var(--color-text-secondary)' }}>
+                {squad} • {viewAthletes.length} players
+              </Typography>
+            </Stack>
+          </ListItem>
+        </List>
+
+        <Box sx={{ overflow: 'auto' }}>
+          <GroupedAthleteList
+            athletes={viewAthletes as any}
+            selectedAthletes={selectedAthletes}
+            onSelectionChange={handlePlayerToggle}
+            onBatchSelectionChange={handleBatchPlayersToggle}
+            groupBy={'position' as GroupBy}
+            order={'asc' as SortOrder}
+          />
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -413,10 +486,22 @@ export const ClubsList: React.FC<ClubsListProps> = ({
                             lineHeight: 1.3,
                             flexGrow: 1,
                             color: 'var(--color-text-primary)',
+                            cursor: 'pointer',
                           }}
+                          onClick={() => setDrillDown({ club, squad })}
                         >
                           {squad}
                         </Typography>
+                        <IconButton
+                          edge="end"
+                          size="small"
+                          onClick={() => setDrillDown({ club, squad })}
+                          disabled={readOnly}
+                          aria-label={`View ${squad} players`}
+                          sx={{ color: 'var(--color-text-secondary)' }}
+                        >
+                          <ChevronRightOutlinedIcon fontSize="small" />
+                        </IconButton>
                       </ListItem>
                     );
                   })}
